@@ -1,0 +1,11 @@
+name,reach,impact,confidence,effort
+Dark Mode,5000,2,0.8,10
+Better Search,8000,3,0.9,20
+API Integration,3000,2,0.7,15
+Push Notifications,6000,1,0.8,5
+Mobile App,10000,3,0.6,60
+Two-Factor Auth,4000,3,0.9,8
+User Analytics Dashboard,7000,2,0.7,25
+Export to Excel,2000,1,0.8,3
+Bulk Upload,3000,2,0.6,12
+Dark Theme for Mobile,4000,1,0.8,8
