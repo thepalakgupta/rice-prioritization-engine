@@ -570,4 +570,4 @@ Found a bug? Have a question?
 
 **Built with ❤️ for product teams** | Data-Driven Decisions
 
-*Last updated: July 2024*
+*Last updated: July 2026*
