@@ -1,425 +1,327 @@
 # RICE Prioritization Engine
 
-A data-driven framework for feature prioritization in product development.
+A data-driven framework for prioritizing product features using the RICE methodology with Claude AI-powered explanations.
 
 ## Overview
 
-RICE is a prioritization framework that helps teams move from subjective debates to data-driven decisions about which features to build first.
+This prioritization engine helps product managers decide which features to build first by scoring them on **Reach, Impact, Confidence, and Effort**.
 
-Instead of arguing "Dark mode is important!" vs "Better search is more important!", use RICE to score both objectively.
+**Key Insight:** The optimal feature roadmap is rarely obvious—use data and AI reasoning to remove bias and emotional decision-making.
 
-## The Problem
+## Why Claude API for Recommendations?
 
-**Without RICE:**
-- Teams argue about priorities
-- Loud voices win, not best ideas
-- No shared language for prioritization
-- Decisions change frequently
-- Resources wasted on low-impact features
-
-**With RICE:**
-- Objective scoring methodology
-- Everyone uses same criteria
-- Decisions are defensible and repeatable
-- Transparent trade-offs visible to all
-- Maximize impact per effort spent
-
-## How RICE Works
-
-### Formula
-```
-RICE Score = (Reach × Impact × Confidence) / Effort
-```
-
-Higher score = higher priority to build first
-
-### Components
-
-#### **Reach** - How many users/customers will this feature affect?
-- Count of users or percentage
-- Per month or per year? Specify clearly
-- Example: "500 users per month" or "5000 users total"
-
-#### **Impact** - How much will this feature affect each user?
-- 3 = Major (3x impact) - transformative, changes workflow
-- 2 = Medium (2x impact) - noticeable improvement
-- 1 = Minor (1x impact) - small improvement
-- 0.5 = Minimal (0.5x impact) - barely noticeable
-
-*Impact is a multiplier, not just a scale*
-
-#### **Confidence** - How sure are you about Reach and Impact?
-- 100% = Very sure (we have data, past projects, user research)
-- 75% = Fairly sure (we surveyed users, have assumptions)
-- 50% = Somewhat sure (educated guess, limited data)
-- 25% = Low confidence (complete guess)
-
-*Confidence is a modifier. Reduce scores if uncertain.*
-
-#### **Effort** - How much work is required?
-- In days, weeks, or months (be consistent)
-- Includes: development + testing + QA + deployment
-- Think realistically. Most estimates are too optimistic.
-- Accounts for dependencies and blockers
-
-*Effort is a divisor. More effort = lower priority.*
-
-### Example Walkthrough
+### The Problem with Feature Prioritization
 
 ```
-Feature: Dark Mode
+Without AI:
+"Feature A should be first" ← Manager opinion
+"No, Feature B is better" ← Conflicting opinions
+Decision made by: Loudest voice or politics ❌
 
-Reach: 5000 users
-  → We have 50,000 users total
-  → Survey showed 10% use dark mode = 5,000 users
-
-Impact: 2 (Medium)
-  → Improves experience for late-night users
-  → Not a workflow-changing feature
-  → Nice to have, not critical
-
-Confidence: 80% (or 0.8)
-  → We surveyed 500 users, 10% want it
-  → Industry data shows dark mode popular
-  → But we're not 100% sure of actual adoption
-
-Effort: 10 days
-  → Frontend changes: 5 days
-  → Testing: 2 days
-  → Backend support: 2 days
-  → Realistic, not optimistic
-
-RICE Score = (5000 × 2 × 0.8) / 10
-           = 8000 / 10
-           = 800
-
-Interpretation: Dark Mode scores 800 points. 
-Compare with other features to prioritize.
+With Claude API:
+Feature A: RICE = 480
+Feature B: RICE = 900
+Claude explains: "Feature B reaches 500 customers, improves conversion by 40%, 
+requires only 2 weeks. Recommendation: Build Feature B first."
+Decision made by: Data + AI reasoning ✅
 ```
 
-### Real Example Comparison
+### Why We Use Claude API
 
-| Feature | Reach | Impact | Confidence | Effort | RICE Score | Priority |
-|---------|-------|--------|-----------|--------|-----------|----------|
-| Push Notifications | 6000 | 1 | 0.8 | 5 | **960** | #1 Build First |
-| Better Search | 8000 | 3 | 0.9 | 20 | **1080** | #2 Build Second |
-| Dark Mode | 5000 | 2 | 0.8 | 10 | **800** | #3 |
-| Mobile App | 10000 | 3 | 0.6 | 60 | **300** | #4 |
-| Bug Fixes | 2000 | 1 | 1.0 | 2 | **1000** | #5 |
+1. **Explain RICE Scores in Natural Language**
+   - Raw score (480) means nothing to stakeholders
+   - Claude API generates: "This feature reaches 1,000 users, provides 3x impact, 
+     80% confidence, takes 5 weeks of effort. ROI-weighted score: 480."
+   - Stakeholders understand the reasoning, not just the number
 
-**Key Insight:** Push Notifications wins despite lower reach because effort is minimal (5 days). Mobile App loses despite largest reach because effort is huge (60 days). Better Search wins on total score: big reach × high impact × good confidence.
+2. **Generate Feature Recommendations**
+   - Simple ranking: [Feature A, Feature B, Feature C]
+   - Claude API powered: "Top 3 priorities: Feature B (highest ROI), Feature A 
+     (quick win), Feature C (strategic). Feature D should be deprioritized because 
+     reach is low despite high impact."
 
-## Installation
+3. **Provide Strategic Context**
+   - Data says: "Build Feature B"
+   - Claude API explains: "This aligns with Q3 growth goals, targets high-value 
+     customer segment, and creates competitive advantage against Competitor X"
 
-### Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
+4. **Handle Edge Cases**
+   - Two features have same score?
+   - Claude API reasons: "Both score equally, but Feature A builds on existing 
+     infrastructure (lower risk), while Feature B requires new tech stack."
 
-### Quick Start
+### Example: Claude API in Action
+
+```python
+from anthropic import Anthropic
+
+client = Anthropic()
+
+# After calculating RICE scores
+features_with_scores = [
+    {"name": "Dark Mode", "reach": 5000, "impact": 3, "confidence": 0.8, "effort": 3, "score": 400},
+    {"name": "Analytics Dashboard", "reach": 500, "impact": 4, "confidence": 0.9, "effort": 5, "score": 360},
+    {"name": "API Integration", "reach": 100, "impact": 5, "confidence": 0.7, "effort": 8, "score": 87}
+]
+
+# Ask Claude to explain and recommend
+message = client.messages.create(
+    model="claude-opus-4-8",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": f"""
+            I have calculated RICE scores for these features:
+            
+            {features_with_scores}
+            
+            Please:
+            1. Recommend the top 2 features to build
+            2. Explain why in business terms
+            3. Mention any strategic considerations
+            """
+        }
+    ]
+)
+
+recommendation = message.content[0].text
+print(recommendation)
+
+# Output example:
+# "Top priority: Dark Mode (400 score)
+#  - Reaches 5,000 users (largest impact)
+#  - High confidence (80%) - we know customers want this
+#  - Reasonable effort (3 weeks)
+#  - Strategic: Quick win for user satisfaction
+#  
+#  Second priority: Analytics Dashboard (360 score)
+#  - Targets enterprise customers (high-value)
+#  - Highest impact (4x) on customer retention
+#  - Well-understood scope (90% confidence)
+#  
+#  Skip API Integration for now:
+#  - Reaches only 100 users (low reach = low ROI)
+#  - Requires 8 weeks (opportunity cost too high)
+#  - Revisit in Q4 if customer demand increases"
+```
+
+## How Claude API Enhances This Project
+
+| Without Claude | With Claude API |
+|---|---|
+| "Feature B wins: 900 vs 480" | "Build Feature B because it reaches 500 customers, provides 3x improvement, requires low effort" |
+| Spreadsheet of scores | Natural language explanation stakeholders understand |
+| PM makes final call | AI-assisted reasoning reduces bias |
+| No strategic context | Claude suggests timing, risks, dependencies |
+
+## Installation & Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/thepalakgupta/rice-prioritization-engine.git
-cd rice-prioritization-engine
-
-# Create virtual environment (optional but recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the Streamlit app
+# Set Claude API key
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Run the app
 streamlit run app.py
 ```
 
-The app will open at `http://localhost:8501`
+## Usage with Claude API
 
-## Usage
-
-### Method 1: Interactive Web App (Easiest)
-
-```bash
-streamlit run app.py
-```
-
-**Features:**
-- Add features one by one
-- Real-time RICE score calculation
-- Auto-ranked prioritization
-- Export results to CSV
-- Visual charts and rankings
-
-### Method 2: Python Script with CSV
+### Method 1: Get AI-Powered Recommendations
 
 ```python
 from src.rice_calculator import RICECalculator
-from src.utils import load_features_from_csv, print_rankings
+from anthropic import Anthropic
 
-# Load features from CSV file
-features = load_features_from_csv('data/sample_features.csv')
+# Step 1: Calculate RICE scores
+calculator = RICECalculator()
+scores = calculator.rank_features(features_data)
 
-# Initialize calculator
-calc = RICECalculator()
+# Step 2: Get Claude's analysis
+client = Anthropic()
 
-# Calculate scores and rank
-ranked = calc.rank_features(features)
-
-# Print beautiful results
-print_rankings(ranked)
-```
-
-**Sample Output:**
-```
-======================================================================
-RICE PRIORITIZATION RESULTS
-======================================================================
-Rank   Feature                   RICE Score      Effort    
-----------------------------------------------------------------------
-1      Push Notifications        7500.00         5         
-2      Better Search             2160.00         20        
-3      Dark Mode                 800.00          10        
-4      Mobile App                300.00          60        
-======================================================================
-```
-
-### Method 3: Programmatic (Single Feature)
-
-```python
-from src.rice_calculator import RICECalculator
-
-# Initialize
-calc = RICECalculator()
-
-# Calculate single feature score
-score = calc.calculate_score(
-    reach=5000,
-    impact=2,
-    confidence=0.8,
-    effort=10
+message = client.messages.create(
+    model="claude-opus-4-8",
+    max_tokens=1024,
+    messages=[{
+        "role": "user",
+        "content": f"Analyze these RICE scores and recommend top 3 features: {scores}"
+    }]
 )
 
-print(f"RICE Score: {score}")  # Output: 800.0
+print(message.content[0].text)
+# Returns: Natural language recommendation with reasoning
 ```
 
-### Method 4: Batch Processing
+### Method 2: Explain Individual Feature
 
 ```python
-from src.rice_calculator import RICECalculator
+# User selects "Dark Mode" feature and asks "Why should we build this?"
+# App calls Claude API:
 
-calc = RICECalculator()
+explanation_request = f"""
+Feature: Dark Mode
+RICE Score: 400
+- Reach: 5,000 users
+- Impact: 3x
+- Confidence: 80%
+- Effort: 3 weeks
 
-features = [
-    {
-        'name': 'Dark Mode',
-        'reach': 5000,
-        'impact': 2,
-        'confidence': 0.8,
-        'effort': 10
-    },
-    {
-        'name': 'Better Search',
-        'reach': 8000,
-        'impact': 3,
-        'confidence': 0.9,
-        'effort': 20
-    },
-    {
-        'name': 'Push Notifications',
-        'reach': 6000,
-        'impact': 1,
-        'confidence': 0.8,
-        'effort': 5
-    }
-]
+Explain why this is a good feature to prioritize right now, considering:
+1. User base impact
+2. Implementation difficulty
+3. Competitive advantages
+4. Strategic timing
+"""
 
-# Rank all features
-ranked = calc.rank_features(features)
+message = client.messages.create(
+    model="claude-opus-4-8",
+    max_tokens=512,
+    messages=[{"role": "user", "content": explanation_request}]
+)
 
-# Print results
-for rank, feature in enumerate(ranked, 1):
-    print(f"{rank}. {feature['name']}: {feature['rice_score']}")
-
-# Output:
-# 1. Push Notifications: 960.0
-# 2. Better Search: 2160.0
-# 3. Dark Mode: 800.0
+print(message.content[0].text)
 ```
 
-## Example: Complete Walkthrough
+## Why Claude API Over Other Solutions?
 
-See `notebooks/example_prioritization.ipynb` for a Jupyter notebook that walks through:
-1. Loading sample data
-2. Calculating RICE scores
-3. Visualizing results with charts
-4. Interpreting rankings
+### ✅ Claude API Advantages
 
-### Quick Example with Sample Data
+1. **Natural Language Reasoning**
+   - Explains WHY, not just ranking
+   - Stakeholders understand the logic
+   - Reduces meeting friction
 
-We include 10 sample features in `data/sample_features.csv`:
+2. **Context Understanding**
+   - Understands product strategy
+   - Considers trade-offs
+   - Generates strategic insights
 
-| Feature | Reach | Impact | Confidence | Effort | RICE Score |
-|---------|-------|--------|-----------|--------|-----------|
-| Push Notifications | 6000 | 1 | 0.8 | 5 | 960.0 |
-| Mobile App | 10000 | 3 | 0.6 | 60 | 300.0 |
-| Better Search | 8000 | 3 | 0.9 | 20 | 1080.0 |
-| Two-Factor Auth | 4000 | 3 | 0.9 | 8 | 1350.0 |
-| Dark Mode | 5000 | 2 | 0.8 | 10 | 800.0 |
-| User Analytics Dashboard | 7000 | 2 | 0.7 | 25 | 392.0 |
-| API Integration | 3000 | 2 | 0.7 | 15 | 280.0 |
-| Bulk Upload | 3000 | 2 | 0.6 | 12 | 300.0 |
-| Export to Excel | 2000 | 1 | 0.8 | 3 | 533.3 |
-| Dark Theme for Mobile | 4000 | 1 | 0.8 | 8 | 400.0 |
+3. **Customizable Explanations**
+   - For executives: "Reaches largest customer segment, high ROI"
+   - For engineers: "Technical complexity: medium, uses existing stack"
+   - For customers: "Requested by 5,000 users, improves experience"
 
-**Top 3 to Build:**
-1. **Two-Factor Auth** (1350.0) - High impact security, moderate effort
-2. **Better Search** (1080.0) - High reach, high impact
-3. **Push Notifications** (960.0) - Quick win, low effort
+4. **Handles Ambiguity**
+   - Two features same score?
+   - Claude suggests tie-breaking criteria
+   - Explains risks and opportunities
 
-## Key Insights & Best Practices
+### ❌ Without Claude API
 
-### Insight 1: Effort is a Powerful Divisor
+- Numbers alone don't convince
+- PMs spend hours explaining each decision
+- Stakeholders second-guess the process
+- No strategic context
 
+## Real-World Example
+
+### Scenario: SaaS Product Roadmap
+
+**Features evaluated:**
+- Feature A: Dark Mode (Score: 400)
+- Feature B: Analytics (Score: 360)
+- Feature C: API (Score: 87)
+
+**Without Claude API:**
 ```
-Same reach and impact, different effort:
-Feature A: (5000 × 2 × 0.8) / 10 = 800
-Feature B: (5000 × 2 × 0.8) / 5 = 1600  ← Wins (half the effort!)
-
-Halving effort doubles the score!
-```
-
-**Lesson:** Quick wins (low effort, decent impact) rank surprisingly high.
-
-### Insight 2: Confidence Matters More Than You Think
-
-```
-Same reach and effort, different confidence:
-Feature A: (5000 × 2 × 1.0) / 10 = 1000  (100% confident)
-Feature B: (5000 × 2 × 0.5) / 10 = 500   (50% confident)
-
-Uncertain features score half as high.
+PM: "Build in this order: A, B, C"
+Stakeholder: "Why not B first?"
+PM: "Because the score is lower"
+Stakeholder: "But my biggest clients want B"
+[Debate continues for 30 minutes]
 ```
 
-**Lesson:** Don't guess. If uncertain, do user research first.
-
-### Insight 3: Impact Multiplies Everything
-
+**With Claude API:**
 ```
-Same reach and effort, different impact:
-Feature A: (8000 × 1 × 0.8) / 10 = 640
-Feature B: (8000 × 3 × 0.8) / 10 = 1920  ← Wins (3x impact!)
+Claude explains:
+"Feature A reaches the broadest audience (5,000 users) and is quick to implement.
+It's a quick win for user satisfaction.
 
-Impact of 3x vs 1x is a 3x difference in score.
+Feature B targets enterprise customers (fewer users, but higher value).
+It has the highest impact (4x) on retention for high-paying accounts.
+
+Recommendation: Ship A in sprint 1 (morale + quick revenue), 
+then B in sprint 2 (revenue retention). Skip C until customer demand increases."
+
+Result: Stakeholders align. Decision is defensible. Time saved: 20 minutes.
 ```
 
-**Lesson:** Focus on transformative features, not incremental improvements.
+## When Claude API is Most Valuable
 
-### Best Practices
+✅ **Large feature backlogs** (20+ features to prioritize)
+✅ **Stakeholder alignment needed** (explain reasoning to executives)
+✅ **Conflicting priorities** (Claude identifies trade-offs)
+✅ **Strategic planning** (Claude considers long-term implications)
+✅ **Resource constraints** (Claude explains opportunity cost)
 
-1. **Be Honest About Effort** 
-   - Most teams underestimate by 50%
-   - Add buffer for QA, bugs, deployment
-   - Include dependencies and blockers
+## Technical Implementation
 
-2. **Don't Overestimate Confidence**
-   - If you guessed, confidence = 50%
-   - If you surveyed 10 users, confidence = 75%
-   - If you have hard data, confidence = 100%
+### Adding Claude API to Your RICE App
 
-3. **Compare Similar Features**
-   - RICE works best for comparing features in same category
-   - Don't compare "bug fix" with "new feature"
-   - Handle critical bugs separately
+```python
+# In app.py (Streamlit app)
 
-4. **Re-evaluate Quarterly**
-   - Market conditions change
-   - User needs evolve
-   - Re-run RICE each quarter
+import streamlit as st
+from anthropic import Anthropic
 
-5. **Use as Guide, Not Gospel**
-   - RICE is objective but not perfect
-   - Strategic decisions override scores
-   - Team morale and alignment matter
+client = Anthropic()
 
-## When to Use RICE
+st.title("RICE Prioritization Engine")
 
-### ✅ Perfect For:
-- **Quarterly Planning** - What to build next quarter?
-- **Feature Comparison** - Feature A vs Feature B vs Feature C?
-- **Stakeholder Alignment** - Show data-driven reasoning
-- **Team Prioritization** - Remove ego from decisions
-- **New Feature Ideas** - Evaluate incoming requests
+# User inputs features
+features = st.text_area("Enter features (one per line)")
 
-### ❌ Not Suitable For:
-- **Bug Fixes** - Fix critical bugs immediately
-- **Technical Debt** - Prioritize separately
-- **Emergency Response** - Handle crises first
-- **Maintenance** - Allocate separately
-- **Strategic Bets** - Business strategy overrides RICE
+# Calculate RICE scores
+rice_scores = calculate_rice(features)
 
-## Limitations & Assumptions
+# Get Claude's analysis
+if st.button("Get AI Recommendation"):
+    message = client.messages.create(
+        model="claude-opus-4-8",
+        max_tokens=1024,
+        messages=[{
+            "role": "user",
+            "content": f"Analyze these RICE scores and provide strategic recommendations:\n{rice_scores}"
+        }]
+    )
+    
+    st.write("### Claude's Recommendation")
+    st.write(message.content[0].text)
+```
 
-⚠️ **This framework assumes:**
+## Why This Matters for Your Resume
 
-1. **Linear Relationships** - Reality is often non-linear
-   - Doubling users doesn't always double value
-   - Impact compounds in complex ways
+**Before (Traditional RICE):**
+```
+"Built RICE prioritization tool"
+← Sounds like a calculator
+```
 
-2. **Independent Features** - Assumes no dependencies
-   - Some features unlock other features
-   - Some features block others
-   - Handle dependencies separately
+**After (With Claude API):**
+```
+"Built AI-powered RICE prioritization engine using Claude API 
+that generates natural language feature recommendations and 
+strategic justifications—enabling faster stakeholder alignment 
+and data-driven roadmap decisions"
+← Sounds like a smart system
+```
 
-3. **Accurate Estimates** - Teams often guess on reach/impact
-   - Base estimates on data when possible
-   - Adjust confidence down if guessing
-   - Re-validate after launch
+The Claude API integration shows:
+- ✅ You understand prompt engineering
+- ✅ You know how to add AI to products
+- ✅ You think about user experience (explanations matter)
+- ✅ You solve real problems (alignment takes time)
 
-4. **Static Context** - Assumes market doesn't change
-   - Competitors launch features
-   - User needs shift
-   - Re-run RICE monthly/quarterly
-
-### Future Improvements
-
-To make RICE more powerful:
-
-- [ ] **Add feature dependencies** - Features that unlock others
-- [ ] **Account for seasonality** - Different times of year
-- [ ] **Revenue weighting** - High-value customers vs average
-- [ ] **Competitor analysis** - Factor in competitive moves
-- [ ] **Team capacity** - What can you actually do this quarter?
-- [ ] **Learning value** - R&D features for future potential
-- [ ] **Risk scoring** - High-risk vs low-risk efforts
-
-## Testing
-
-### Run Unit Tests
+## Installation
 
 ```bash
-pytest tests/
-```
-
-### Test Coverage
-
-Tests verify:
-- ✅ Correct RICE calculation
-- ✅ Edge cases (zero effort, invalid impact, etc.)
-- ✅ Input validation
-- ✅ Feature ranking accuracy
-- ✅ Score precision (2 decimal places)
-
-### Example Test Output
-
-```
-tests/test_rice_calculator.py::TestRICECalculator::test_basic_calculation PASSED
-tests/test_rice_calculator.py::TestRICECalculator::test_zero_effort_raises_error PASSED
-tests/test_rice_calculator.py::TestRICECalculator::test_invalid_confidence PASSED
-tests/test_rice_calculator.py::TestRICECalculator::test_invalid_impact PASSED
-tests/test_rice_calculator.py::TestRICECalculator::test_ranking_features PASSED
-tests/test_rice_calculator.py::TestRICECalculator::test_score_precision PASSED
-
-==================== 6 passed in 0.15s ====================
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY="your-key-here"
+streamlit run app.py
 ```
 
 ## Project Structure
@@ -427,147 +329,22 @@ tests/test_rice_calculator.py::TestRICECalculator::test_score_precision PASSED
 ```
 rice-prioritization-engine/
 ├── src/
-│   ├── __init__.py                    # Package initialization
-│   ├── rice_calculator.py             # Core RICE calculation logic
-│   ├── utils.py                       # Helper functions (load CSV, print)
-│   └── config.py                      # Configuration and constants
-├── data/
-│   └── sample_features.csv            # Example feature data for testing
-├── notebooks/
-│   └── example_prioritization.ipynb   # Jupyter notebook walkthrough
-├── tests/
-│   └── test_rice_calculator.py        # Unit tests (6 test cases)
-├── app.py                             # Streamlit interactive web app
-├── requirements.txt                   # Python dependencies
-├── .gitignore                         # Git ignore rules
-└── README.md                          # This file
+│   ├── rice_calculator.py    # RICE scoring logic
+│   ├── claude_integrator.py  # Claude API calls
+│   └── utils.py
+├── app.py                    # Streamlit app with Claude
+├── README.md
+└── requirements.txt
 ```
 
-### File Descriptions
+## References
 
-| File | Purpose |
-|------|---------|
-| `rice_calculator.py` | Core RICECalculator class with score calculation and ranking |
-| `utils.py` | Utility functions: load CSV, save results, pretty print |
-| `config.py` | Configuration, constants, component definitions |
-| `sample_features.csv` | 10 example features for testing and learning |
-| `example_prioritization.ipynb` | Step-by-step Jupyter notebook |
-| `test_rice_calculator.py` | 6 unit tests covering all functionality |
-| `app.py` | Streamlit web app for interactive use |
-
-## How to Contribute
-
-Found a bug or have a feature idea?
-
-1. **Report Issues:**
-   - Create an issue on GitHub
-   - Describe the problem
-   - Include example inputs/outputs
-
-2. **Contribute Code:**
-   - Fork the repository
-   - Create a feature branch: `git checkout -b feature/my-improvement`
-   - Commit changes: `git commit -m "Add: My improvement"`
-   - Push to branch: `git push origin feature/my-improvement`
-   - Submit a pull request
-
-3. **Improve Documentation:**
-   - Update README with examples
-   - Add comments to code
-   - Create additional notebooks
-
-## Examples from Real Companies
-
-### Intercom's Approach
-Intercom, a customer communication platform, uses RICE to decide what to build. They published the framework in a famous blog post: [RICE: Simple prioritization for product managers](https://www.intercom.com/blog/rice-prioritization-framework/)
-
-### Modified Versions
-Some teams modify RICE:
-- **RICED** - Adds Customer Happiness as factor
-- **RICE + Revenue** - Weights by customer LTV
-- **RICE + Risk** - Accounts for implementation risk
-
-Feel free to adapt for your team's needs!
-
-## FAQ
-
-### Q: What if I don't have historical data?
-
-**A:** Use your best estimate and reduce confidence. 
-- No data = 50% confidence
-- 10 users surveyed = 75% confidence  
-- Hard data from analytics = 100% confidence
-
-Then gather data as you build and re-evaluate.
-
-### Q: Should we include bug fixes in RICE?
-
-**A:** No. Handle bugs separately:
-- Critical bugs: Fix immediately
-- Annoying bugs: Next sprint
-- Minor bugs: Backlog
-
-Only use RICE for feature prioritization.
-
-### Q: How often should we re-run RICE?
-
-**A:** Depends on your market:
-- Fast-moving startup: Monthly
-- Stable product: Quarterly
-- Large enterprise: Annually
-
-Re-run when:
-- Launching new major feature
-- Competitive threat emerges
-- Team capacity changes
-- User feedback reveals new needs
-
-### Q: Can I use RICE for projects outside tech?
-
-**A:** Yes! RICE works for any project:
-- Marketing campaigns (reach = audience, impact = conversions)
-- Sales initiatives (reach = prospects, impact = deal size)
-- HR programs (reach = employees affected, impact = productivity)
-- Operations improvements (reach = processes affected, impact = cost savings)
-
-### Q: What if two features score the same?
-
-**A:** Tie-breaker options:
-1. Lower effort wins (quicker value)
-2. Strategic importance wins
-3. Team expertise/enthusiasm wins
-4. Customer/user impact wins
-
-Make it transparent to team.
-
-## License
-
-MIT License - Feel free to use, modify, and distribute.
-
-## Author
-
-**Palak Gupta**
-- LinkedIn: [linkedin.com/in/thepalakgupta](https://linkedin.com/in/thepalakgupta)
-- GitHub: [github.com/thepalakgupta](https://github.com/thepalakgupta)
-- Portfolio: [portfolio-palak-gupta.vercel.app](https://portfolio-palak-gupta.vercel.app)
-
-## References & Further Reading
-
-- [Intercom Blog: RICE Prioritization Framework](https://www.intercom.com/blog/rice-prioritization-framework/)
-- [How to Prioritize Features (Reforge)](https://www.reforge.com/)
-- [Inspired by Marty Cagan](https://www.svpg.com/)
-- [The Lean Startup by Eric Ries](https://theleanstartup.com/)
-- [Jobs to be Done Framework](https://jtbd.info/)
-
-## Support
-
-Found a bug? Have a question?
-- Open an issue on GitHub
-- Email: thepalakgupta@gmail.com
-- LinkedIn DM: [thepalakgupta](https://linkedin.com/in/thepalakgupta)
+- [RICE Framework (Intercom)](https://www.intercom.com/blog/rice-scoring-product-prioritization/)
+- [Claude API Documentation](https://docs.anthropic.com)
+- [Prompt Engineering Guide](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
 
 ---
 
-**Built with ❤️ for product teams** | Data-Driven Decisions
+**Built with ❤️ for product teams** | Data-Driven Prioritization with AI
 
-*Last updated: July 2026*
+*Features are difficult to prioritize. Claude makes it easier.*
