@@ -1,6 +1,6 @@
 # RICE Prioritization Engine
 
-A data-driven framework for prioritizing product features using the RICE methodology (Reach, Impact, Confidence, Effort).
+A data-driven framework for prioritizing product features using the RICE methodology (Reach, Impact, Confidence, Effort).The live demonstration of which can be viewed here : https://rice-prioritization-engine.streamlit.app/
 
 ## Why Claude API?
 
